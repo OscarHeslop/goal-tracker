@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Tracker</title>
+</head>
+
+<body>
+
+    <!-- Aim: have multiple goals -->
+
+    <h1>Add Goal</h1>
+
+    <label for="goal_name">Goal Name</label>
+    <input type="text" id="goal_name" name="goal_name">
+    <br>
+
+    <label for="goal_description">Description</label><br>
+    <textarea id="goal_description" name="goal_description"></textarea>
+    <br>
+    <label for="goal_deadline">Deadline</label>
+    <input type="date" id="goal_deadline" name="goal_deadline">
+    <br>
+    <label for="goal_why_it_matters">Why It Matters</label>
+    <textarea id="goal_why_it_matters" name="goal_why_it_matters"></textarea>
+    <br>
+    <button type="button" onclick="send_goal_info()">Send Goal</button>
+
+
+    <div id="goals_text_box"></div>
+
+
+    <script>
+
+        function send_goal_info() {
+
+            const goalName = document.querySelector("#goal_name").value;
+            const description = document.querySelector("#goal_description").value;
+            const deadline = document.querySelector("#goal_deadline").value;
+            const whyItMatters = document.querySelector("#goal_why_it_matters").value;
+
+            fetch("/sending_goal_details", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    goal_name: goalName,
+                    description: description,
+                    deadline: deadline,
+                    why_it_matters: whyItMatters
+                })
+
+            })
+
+            .then(response => response.text())
+
+            .then(data => {
+
+                document.querySelector("#goals_text_box").innerHTML += data;
+
+            });
+
+        }
+
+    </script>
+
+</body>
+</html>
