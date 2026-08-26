@@ -8,6 +8,8 @@ def home():
     return render_template("index.html")
 
 
+
+from database.editing import add_record
 @app.route("/sending_goal_details", methods=["POST"])
 def sending_goal_details():
 
@@ -18,7 +20,7 @@ def sending_goal_details():
     goal_name = data["goal_name"]
     description = data["description"]
     deadline = data["deadline"]
-    why_it_matters = data["why_it_matters"]
+    why_goal_matters = data["why_it_matters"]
 
     # Create HTML
     goal_html = ""
@@ -32,13 +34,18 @@ def sending_goal_details():
 
         <p><strong>Deadline:</strong> {deadline}</p>
 
-        <p><strong>Why It Matters:</strong> {why_it_matters}</p>
+        <p><strong>Why It Matters:</strong> {why_goal_matters}</p>
 
         <hr>
     """
 
+    add_record(goal_name, description, deadline, why_goal_matters)
+
     return goal_html
 
 
+
+from database.creating_deleting import create_goals_database
 if __name__ == "__main__":
+    create_goals_database()
     app.run(debug=True)
