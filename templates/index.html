@@ -33,8 +33,17 @@
 
     <script>
 
-        function send_goal_info() {
+        async function display_all_goals_stored() {
+            const response = await fetch("/get_all_stored_goals");
+            const data = await response.text();
 
+            document.querySelector("#goals_text_box").innerHTML += data;
+        }
+
+
+
+        async function send_goal_info() {
+            display_all_goals_stored();
             const goalName = document.querySelector("#goal_name").value;
             const description = document.querySelector("#goal_description").value;
             const deadline = document.querySelector("#goal_deadline").value;
@@ -66,7 +75,9 @@
             });
 
         }
-
+        
+        
+        display_all_goals_stored();
     </script>
 
 </body>

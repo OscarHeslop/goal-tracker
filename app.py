@@ -43,9 +43,39 @@ def sending_goal_details():
 
     return goal_html
 
+import sqlite3
+@app.route("/get_all_stored_goals", methods=["GET"])
+def get_all_stored_goals():
+    conn = sqlite3.connect("storage/goals.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT *
+        FROM goals 
+                   
+""")
+    list = cursor.fetchall()
+    string = ""
+    for id,goal_name,description,deadline,why_goal_matters,state in list:
 
+
+        string += f"""
+            <h2>Goal: {goal_name}</h2>
+
+            <p><strong>Name:</strong> {goal_name}</p>
+
+            <p><strong>Description:</strong> {description}</p>
+
+            <p><strong>Deadline:</strong> {deadline}</p>
+
+            <p><strong>Why It Matters:</strong> {why_goal_matters}</p>
+
+            <hr>
+        """
+
+    return string
 
 from database.creating_deleting import create_goals_database
 if __name__ == "__main__":
+    
     create_goals_database()
     app.run(debug=True)
