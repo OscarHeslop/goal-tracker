@@ -1,7 +1,7 @@
 import sqlite3
 
 
-def add_record(name, description, deadline, why_matters):
+def create_goal(name, description, deadline, why_matters):
 
     conn = sqlite3.connect("storage/goals.db")
     cursor = conn.cursor()

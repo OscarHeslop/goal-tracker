@@ -8,8 +8,6 @@
 
 <body>
 
-    <!-- Aim: have multiple goals -->
-
     <h1>Add Goal</h1>
 
     <label for="goal_name">Goal Name</label>
@@ -19,81 +17,85 @@
     <label for="goal_description">Description</label><br>
     <textarea id="goal_description" name="goal_description"></textarea>
     <br>
+
     <label for="goal_deadline">Deadline</label>
     <input type="date" id="goal_deadline" name="goal_deadline">
     <br>
+
     <label for="goal_why_it_matters">Why It Matters</label>
     <textarea id="goal_why_it_matters" name="goal_why_it_matters"></textarea>
     <br>
-    <button type="button" onclick="send_goal_info()">Send Goal</button>
- 
 
+    <button type="button" onclick="send_goal_info()">Send Goal</button>
 
     <div id="goals_text_box"></div>
-
 
     <script>
 
         async function display_all_goals_stored() {
             const response = await fetch("/get_all_stored_goals");
             const data = await response.text();
-
             document.querySelector("#goals_text_box").innerHTML = data;
         }
 
+        async function send_milestone_info(goal_id) {
+            const milestone_title = document.querySelector("#milestone_title_" + goal_id).value;
+            const milestone_description = document.querySelector("#milestone_description_" + goal_id).value;
+            const milestone_schedule = document.querySelector("#milestone_schedule_" + goal_id).value;
 
+            await fetch("/create_milestone", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    goal_id: goal_id,
+                    title_milestone: milestone_title,
+                    description: milestone_description,
+                    schedule: milestone_schedule
+                })
+            });
+
+            display_all_goals_stored();
+        }
 
         async function send_goal_info() {
-            display_all_goals_stored();
             const goalName = document.querySelector("#goal_name").value;
             const description = document.querySelector("#goal_description").value;
             const deadline = document.querySelector("#goal_deadline").value;
             const whyItMatters = document.querySelector("#goal_why_it_matters").value;
 
-            fetch("/sending_goal_details", {
-
+            await fetch("/sending_goal_details", {
                 method: "POST",
-
                 headers: {
                     "Content-Type": "application/json"
                 },
-
                 body: JSON.stringify({
                     goal_name: goalName,
                     description: description,
                     deadline: deadline,
                     why_it_matters: whyItMatters
                 })
-
-            })
-
-            .then(response => response.text())
-
-            .then(data => {
-
-                document.querySelector("#goals_text_box").innerHTML += data;
-
             });
 
+            display_all_goals_stored();
         }
-        
-        
+
+        async function delete_goal(goal_id) {
+            await fetch("/remove_goal", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    goal_id: goal_id
+                })
+            });
+
+            display_all_goals_stored();
+        }
+
         display_all_goals_stored();
-
-
-        async function delete_goal(goal_id){
-            await fetch("/remove_goal",{
-            method:"POST",
-            headers:{
-                "Content-Type": "application/json"
-            },
-            body:JSON.stringify({"goal_id":goal_id})
-            }
-            
-            )
-            display_all_goals_stored();   
-        }
-
 
     </script>
 
