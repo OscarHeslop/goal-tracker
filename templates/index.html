@@ -26,6 +26,7 @@
     <textarea id="goal_why_it_matters" name="goal_why_it_matters"></textarea>
     <br>
     <button type="button" onclick="send_goal_info()">Send Goal</button>
+ 
 
 
     <div id="goals_text_box"></div>
@@ -37,7 +38,7 @@
             const response = await fetch("/get_all_stored_goals");
             const data = await response.text();
 
-            document.querySelector("#goals_text_box").innerHTML += data;
+            document.querySelector("#goals_text_box").innerHTML = data;
         }
 
 
@@ -78,6 +79,22 @@
         
         
         display_all_goals_stored();
+
+
+        async function delete_goal(goal_id){
+            await fetch("/remove_goal",{
+            method:"POST",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify({"goal_id":goal_id})
+            }
+            
+            )
+            display_all_goals_stored();   
+        }
+
+
     </script>
 
 </body>

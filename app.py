@@ -36,7 +36,7 @@ def sending_goal_details():
 
         <p><strong>Why It Matters:</strong> {why_goal_matters}</p>
 
-        <hr>
+
     """
 
     add_record(goal_name, description, deadline, why_goal_matters)
@@ -55,7 +55,7 @@ def get_all_stored_goals():
 """)
     list = cursor.fetchall()
     string = ""
-    for id,goal_name,description,deadline,why_goal_matters,state in list:
+    for goal_id,goal_name,description,deadline,why_goal_matters,state in list:
 
 
         string += f"""
@@ -69,10 +69,30 @@ def get_all_stored_goals():
 
             <p><strong>Why It Matters:</strong> {why_goal_matters}</p>
 
+            <br>
+            <button type="button" onclick="delete_goal('{goal_id}')">Delete Goal</button>
             <hr>
         """
 
     return string
+
+
+
+@app.route("/remove_goal", methods=["POST"])
+def remove_goal():
+    conn = sqlite3.connect("storage/goals.db")
+    cursor = conn.cursor()
+    data = request.get_json()
+    goal_id = data["goal_id"]
+    cursor.execute("""
+        DELETE FROM goals 
+        WHERE id = ?""",(goal_id,))
+    
+    conn.commit()
+    conn.close()
+
+    return "Goal deleted"
+
 
 from database.creating_deleting import create_goals_database
 if __name__ == "__main__":
