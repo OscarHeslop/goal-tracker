@@ -41,7 +41,7 @@ def get_all_stored_goals():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, name, description, deadline, why_matters, state
+        SELECT id, name, description, deadline, why_matters, completed_goal
         FROM goals
     """)
 
@@ -76,7 +76,7 @@ def get_all_stored_goals():
 
         # Get milestones belonging to this goal
         cursor.execute("""
-            SELECT id, name, description, deadline, state, milestone_number
+            SELECT id, name, description, deadline, completed_milestone, milestone_number
             FROM milestones
             WHERE goal_id = ?
             ORDER BY milestone_number
@@ -101,10 +101,7 @@ def get_all_stored_goals():
                         {milestone_deadline}
                     </p>
 
-                    <p>
-                        <strong>State:</strong>
-                        {milestone_state}
-                    </p>
+                    <button type="button" id="milestone_status_{milestone_id}" onclick="toggle_milestone_status('{milestone_id}')">{'Completed' if milestone_state == 'True' else 'Not Completed'}</button>
                 </div>
             """
 
@@ -141,15 +138,11 @@ def get_all_stored_goals():
             <label for="milestone_schedule_{goal_id}">Milestone Schedule</label>
             <br>
 
-            <input type="date", id="milestone_schedule_{goal_id}">
+            <input type="date" id="milestone_schedule_{goal_id}">
 
             <br>
 
-            <button
-                type="button"
-                onclick="send_milestone_info('{goal_id}')">
-                Create Milestone
-            </button>
+            <button type="button" onclick="send_milestone_info('{goal_id}')">Create Milestone</button>
 
             <hr>
         """
@@ -157,6 +150,7 @@ def get_all_stored_goals():
     conn.close()
 
     return string
+
 
 @app.route("/remove_goal", methods=["POST"])
 def remove_goal():
@@ -177,6 +171,41 @@ def remove_goal():
     conn.close()
 
     return "Goal deleted"
+
+
+@app.route("/get_milestone_status", methods=["POST"])
+def get_and_switch_milestone_status():
+
+    conn = sqlite3.connect("storage/goals.db")
+    cursor = conn.cursor()
+
+    data = request.get_json()
+
+    milestone_id = data["milestone_id"]
+
+    cursor.execute("""
+        SELECT completed_milestone
+        FROM milestones
+        WHERE id = ?
+    """, (milestone_id,))
+
+    status = cursor.fetchone()[0]
+
+    if status == "True":
+        new_status = "False"
+    else:
+        new_status = "True"
+
+    cursor.execute("""
+        UPDATE milestones
+        SET completed_milestone = ?
+        WHERE id = ?
+    """, (new_status, milestone_id))
+
+    conn.commit()
+    conn.close()
+
+    return new_status
 
 
 @app.route("/create_milestone", methods=["POST"])
@@ -211,7 +240,7 @@ def create_milestone():
             goal_id,
             name,
             description,
-            state,
+            completed_milestone,
             milestone_number
         )
         VALUES (?, ?, ?, ?, ?)
@@ -219,7 +248,7 @@ def create_milestone():
         goal_id,
         milestone_name,
         description,
-        "Not Started",
+        "False",
         milestone_number
     ))
 

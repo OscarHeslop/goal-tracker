@@ -97,6 +97,27 @@
 
         display_all_goals_stored();
 
+        async function toggle_milestone_status(milestone_id) {
+            const response = await fetch("/get_milestone_status", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    milestone_id: milestone_id
+                })
+            });
+
+            const status = await response.text();
+            const button = document.querySelector("#milestone_status_" + milestone_id);
+
+            if (status == "True") {
+                button.innerHTML = "Completed";
+            } else {
+                button.innerHTML = "Not Completed";
+            }
+        }
+
     </script>
 
 </body>

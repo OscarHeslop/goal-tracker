@@ -13,7 +13,7 @@ def create_goals_database():
             description TEXT,
             deadline TEXT,
             why_matters TEXT,
-            state TEXT DEFAULT 'Not Started'
+            completed_goal TEXT DEFAULT 'False'
         )
     """)
 
@@ -25,9 +25,8 @@ def create_goals_database():
             name TEXT,
             description TEXT,
             deadline TEXT,
-            state TEXT DEFAULT 'Not Started',
-            milestone_number INTEGER,
-            FOREIGN KEY (goal_id) REFERENCES goals(id)
+            completed_milestone TEXT DEFAULT 'False',
+            milestone_number INTEGER
         )
     """)
 

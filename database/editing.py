@@ -22,7 +22,7 @@ def update_state(goal_id, new_state):
 
     cursor.execute("""
         UPDATE goals
-        SET state = ?
+        SET completed_goal = ?
         WHERE id = ?
     """, (new_state, goal_id))
 
