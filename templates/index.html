@@ -96,7 +96,7 @@
         }
 
         display_all_goals_stored();
-
+        //milestone button - toggle
         async function toggle_milestone_status(milestone_id) {
             const response = await fetch("/get_milestone_status", {
                 method: "POST",
@@ -116,6 +116,7 @@
             } else {
                 button.innerHTML = "Not Completed";
             }
+            display_all_goals_stored()
         }
 
     </script>

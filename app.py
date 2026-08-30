@@ -48,7 +48,7 @@ def get_all_stored_goals():
     goals = cursor.fetchall()
 
     string = ""
-
+    #displaying all the goals
     for goal_id, goal_name, description, deadline, why_goal_matters, state in goals:
 
         string += f"""
@@ -69,12 +69,39 @@ def get_all_stored_goals():
                 Delete Goal
             </button>
 
-            <br>
 
-            <h3>Milestones</h3>
+
+            <br>
+   
         """
 
-        # Get milestones belonging to this goal
+
+        # Count number of milestones for each goal
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM Milestones
+            WHERE goal_id = ?
+        """, (goal_id,))
+
+        total_num_milestones = cursor.fetchone()[0]
+
+        # Count the number of completed milestones
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM Milestones
+            WHERE goal_id = ?
+            AND completed_milestone = 'True'
+        """, (goal_id,))
+
+        completed_num_milestones = cursor.fetchone()[0]
+
+        #displaying progress bar
+        if total_num_milestones or completed_num_milestones !=0:
+            string += f"<h1>{completed_num_milestones}/{total_num_milestones} completed</h1>"
+
+            
+
+        #getting and displaying milestones
         cursor.execute("""
             SELECT id, name, description, deadline, completed_milestone, milestone_number
             FROM milestones
@@ -83,8 +110,6 @@ def get_all_stored_goals():
         """, (goal_id,))
 
         milestones = cursor.fetchall()
-
-        # Display each milestone
         for milestone_id, milestone_name, milestone_description, milestone_deadline, milestone_state, milestone_number in milestones:
 
             string += f"""
@@ -101,11 +126,14 @@ def get_all_stored_goals():
                         {milestone_deadline}
                     </p>
 
-                    <button type="button" id="milestone_status_{milestone_id}" onclick="toggle_milestone_status('{milestone_id}')">{'Completed' if milestone_state == 'True' else 'Not Completed'}</button>
+                    
                 </div>
             """
+            #milestone button
+            string += f"""<button type="button" id="milestone_status_{milestone_id}" onclick="toggle_milestone_status('{milestone_id}')">{'Completed' if milestone_state == 'True' else 'Not Completed'}</button>"""
 
-        # Create milestone form for this goal
+
+        #create milestone
         string += f"""
             <br>
 
@@ -172,7 +200,7 @@ def remove_goal():
 
     return "Goal deleted"
 
-
+#milestone completed buttob
 @app.route("/get_milestone_status", methods=["POST"])
 def get_and_switch_milestone_status():
 
@@ -201,6 +229,8 @@ def get_and_switch_milestone_status():
         SET completed_milestone = ?
         WHERE id = ?
     """, (new_status, milestone_id))
+
+
 
     conn.commit()
     conn.close()
