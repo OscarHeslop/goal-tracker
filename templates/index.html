@@ -81,6 +81,21 @@
             display_all_goals_stored();
         }
 
+        async function delete_milestone(milestone_id) {
+
+            await fetch("/remove_milestone", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "milestone_id": milestone_id
+                })
+            });
+
+            display_all_goals_stored();
+            }
+
         async function delete_goal(goal_id) {
             await fetch("/remove_goal", {
                 method: "POST",

@@ -101,7 +101,7 @@ def get_all_stored_goals():
 
             
 
-        #getting and displaying milestones
+        #display_milestone display milestone
         cursor.execute("""
             SELECT id, name, description, deadline, completed_milestone, milestone_number
             FROM milestones
@@ -129,11 +129,15 @@ def get_all_stored_goals():
                     
                 </div>
             """
-            #milestone button
+            #milestone toggle button
             string += f"""<button type="button" id="milestone_status_{milestone_id}" onclick="toggle_milestone_status('{milestone_id}')">{'Completed' if milestone_state == 'True' else 'Not Completed'}</button>"""
 
+            #delete milestone delete_milestone remove milestone
+            string += f"""<br><br><button type="button" onclick="delete_milestone('{milestone_id}')">Delete Milestone</button>"""
+            #end of milestone
 
-        #create milestone
+           
+        #create milestone at end interface
         string += f"""
             <br>
 
@@ -172,8 +176,10 @@ def get_all_stored_goals():
 
             <button type="button" onclick="send_milestone_info('{goal_id}')">Create Milestone</button>
 
-            <hr>
+        <hr>
         """
+
+
 
     conn.close()
 
@@ -200,7 +206,26 @@ def remove_goal():
 
     return "Goal deleted"
 
-#milestone completed buttob
+@app.route("/remove_milestone", methods=["POST"])
+def remove_milestone():
+
+    conn = sqlite3.connect("storage/goals.db")
+    cursor = conn.cursor()
+
+    data = request.get_json()
+    milestone_id = data["milestone_id"]
+
+    cursor.execute("""
+        DELETE FROM milestones
+        WHERE id = ?
+    """, (milestone_id,))
+
+    conn.commit()
+    conn.close()
+
+    return "Milestone deleted"
+
+#milestone completed 
 @app.route("/get_milestone_status", methods=["POST"])
 def get_and_switch_milestone_status():
 
