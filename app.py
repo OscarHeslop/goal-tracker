@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 from database.editing import create_goal
 from graph import get_goal_graph
+from database.creating_deleting import create_goals_database
+from datetime import datetime
 app = Flask(__name__)
 
 
@@ -261,6 +263,25 @@ def get_and_switch_milestone_status():
         WHERE id = ?
     """, (new_status, milestone_id))
 
+    #adding to completed database completed_database
+    if new_status == "True":
+
+        completed_at = datetime.now()
+
+        cursor.execute("""
+            INSERT INTO completed (id, type, completed_at)
+            VALUES (?, ?, ?)
+        """, (
+            milestone_id,
+            "milestone",
+            completed_at
+        ))
+
+    conn.commit()
+    conn.close()
+
+    return new_status
+
 
 
     conn.commit()
@@ -319,7 +340,7 @@ def create_milestone():
     return "Milestone created"
 
 
-from database.creating_deleting import create_goals_database
+
 
 
 if __name__ == "__main__":

@@ -30,5 +30,16 @@ def create_goals_database():
         )
     """)
 
+
+
+    # Completed goals and milestones
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS completed (
+            id INTEGER  ,
+            type TEXT  ,
+            completed_at TIMESTAMP
+        )
+    """)
+
     conn.commit()
     conn.close()
