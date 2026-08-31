@@ -1,14 +1,20 @@
 from flask import Flask, render_template, request
-
+from database.editing import create_goal
+from graph import get_goal_graph
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    return render_template("index.html")
 
 
-from database.editing import create_goal
+    
+    goal_graph_html = get_goal_graph()
+
+    return render_template(
+        "index.html",
+        graph=goal_graph_html)
+
 
 
 @app.route("/sending_goal_details", methods=["POST"])

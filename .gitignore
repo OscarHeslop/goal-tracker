@@ -2,3 +2,4 @@
 storage/goals.db
 storage/*.db
 *__pycache__
+*.venv
