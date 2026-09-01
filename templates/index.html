@@ -1,140 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goal Tracker</title>
+    <title>Notes</title>
 </head>
 
 <body>
 
-    <h1>Add Goal</h1>
+    <h1>My Notes</h1>
 
-    <label for="goal_name">Goal Name</label>
-    <input type="text" id="goal_name" name="goal_name">
-    <br>
+    <!-- Notes list -->
+    <div id="notes-list">
 
-    <label for="goal_description">Description</label><br>
-    <textarea id="goal_description" name="goal_description"></textarea>
-    <br>
+        {% for note in notes %}
 
-    <label for="goal_deadline">Deadline</label>
-    <input type="date" id="goal_deadline" name="goal_deadline">
-    <br>
+            <button class="note-button" data-id="{{ note[0] }}" data-title="{{ note[1] }}" data-content="{{ note[2] }}">{{ note[1] }}</button>
 
-    <label for="goal_why_it_matters">Why It Matters</label>
-    <textarea id="goal_why_it_matters" name="goal_why_it_matters"></textarea>
-    <br>
+            <br><br>
 
-    <button type="button" onclick="send_goal_info()">Send Goal</button>
+        {% endfor %}
 
-    <div id="goals_text_box"></div>
+    </div>
+
+
+    <!-- Create new note -->
+    <button onclick="showNoteForm()">+ Create New Note</button>
+
+    <div id="note-form" style="display: none;">
+
+        <br>
+
+        <form action="/create_note" method="POST">
+
+            <input type="text" name="name_page" placeholder="Note title" required>
+
+            <br><br>
+
+            <textarea name="page_content" placeholder="Write your thoughts..." rows="20" cols="80"></textarea>
+
+            <br><br>
+
+            <button type="submit">Create Note</button>
+
+        </form>
+
+    </div>
+
+
+    <!-- Edit selected note -->
+    <div id="selected-note">
+
+        <br>
+
+        <form action="/update_note" method="POST">
+
+            <input type="hidden" id="selected-id" name="note_id">
+
+            <input type="text" id="selected-title" name="name_page" placeholder="Note title" required>
+
+            <br><br>
+
+            <textarea id="selected-content" name="page_content" placeholder="Write your thoughts..." rows="20" cols="80"></textarea>
+
+            <br><br>
+
+            <button type="submit">Save Changes</button>
+
+        </form>
+
+    </div>
+
 
     <script>
 
-        async function display_all_goals_stored() {
-            const response = await fetch("/get_all_stored_goals");
-            const data = await response.text();
-            document.querySelector("#goals_text_box").innerHTML = data;
+        function showNoteForm() {
+            document.getElementById("note-form").style.display = "block";
         }
 
-        async function send_milestone_info(goal_id) {
-            const milestone_title = document.querySelector("#milestone_title_" + goal_id).value;
-            const milestone_description = document.querySelector("#milestone_description_" + goal_id).value;
-            const milestone_schedule = document.querySelector("#milestone_schedule_" + goal_id).value;
 
-            await fetch("/create_milestone", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    goal_id: goal_id,
-                    title_milestone: milestone_title,
-                    description: milestone_description,
-                    schedule: milestone_schedule
-                })
+        const noteButtons = document.querySelectorAll(".note-button");
+
+
+        noteButtons.forEach(function(button) {
+
+            button.addEventListener("click", function() {
+
+                const id = button.dataset.id;
+                const title = button.dataset.title;
+                const content = button.dataset.content;
+
+                document.querySelector("#selected-id").value = id;
+                document.querySelector("#selected-title").value = title;
+                document.querySelector("#selected-content").value = content;
+
             });
 
-            display_all_goals_stored();
-        }
-
-        async function send_goal_info() {
-            const goalName = document.querySelector("#goal_name").value;
-            const description = document.querySelector("#goal_description").value;
-            const deadline = document.querySelector("#goal_deadline").value;
-            const whyItMatters = document.querySelector("#goal_why_it_matters").value;
-
-            await fetch("/sending_goal_details", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    goal_name: goalName,
-                    description: description,
-                    deadline: deadline,
-                    why_it_matters: whyItMatters
-                })
-            });
-
-            display_all_goals_stored();
-        }
-
-        async function delete_milestone(milestone_id) {
-
-            await fetch("/remove_milestone", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "milestone_id": milestone_id
-                })
-            });
-
-            display_all_goals_stored();
-            }
-
-        async function delete_goal(goal_id) {
-            await fetch("/remove_goal", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    goal_id: goal_id
-                })
-            });
-
-            display_all_goals_stored();
-        }
-
-        display_all_goals_stored();
-        //milestone button - toggle
-        async function toggle_milestone_status(milestone_id) {
-            const response = await fetch("/get_milestone_status", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    milestone_id: milestone_id
-                })
-            });
-
-            const status = await response.text();
-            const button = document.querySelector("#milestone_status_" + milestone_id);
-
-            if (status == "True") {
-                button.innerHTML = "Completed";
-            } else {
-                button.innerHTML = "Not Completed";
-            }
-            display_all_goals_stored()
-        }
+        });
 
     </script>
 
 </body>
+
 </html>
