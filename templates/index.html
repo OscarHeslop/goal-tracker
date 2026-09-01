@@ -134,8 +134,15 @@
                 button.innerHTML = "Not Completed";
             }
             display_all_goals_stored()
+            display_graph()
         }
 
+        async function display_graph() {
+            const response = await fetch("/get_graph");
+            const graph_html = await response.text();
+
+            document.querySelector("#graph").innerHTML = graph_html;
+        }
     </script>
 
 </body>

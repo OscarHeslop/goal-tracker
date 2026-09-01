@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from database.editing import create_goal
-from graph import get_goal_graph
+from graph import display_graph
 from database.creating_deleting import create_goals_database
 from datetime import datetime
 app = Flask(__name__)
@@ -11,7 +11,7 @@ def home():
 
 
     
-    goal_graph_html = get_goal_graph()
+    goal_graph_html = display_graph()
 
     return render_template(
         "index.html",
@@ -279,6 +279,8 @@ def get_and_switch_milestone_status():
 
     conn.commit()
     conn.close()
+
+    display_graph()
 
     return new_status
 
